@@ -1,6 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rango.models import Category
 from rango.models import Page
+from rango.form import CategoryForm
+from rango.form import PageForm
+from django.urls import reverse
 from django.http import HttpResponse
 
 def index(request):
@@ -48,3 +51,56 @@ def show_category(request, category_name_slug):
 
     #go render the response and return it to client
     return render(request,'rango/category.html', context=context_dict)
+
+
+#Display an empty form for users to add categories;
+#store the data submitted by the user into the corresponding model, and then render the Rango application home page;
+#if there is an error, display the form again and display the error message together.
+def add_category(request):
+    #create an instance
+    form = CategoryForm
+    if request.method =='POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            #save the new category to the database
+            cat = form.save(commit=True)
+            print(cat)
+            return redirect('/rango/')
+        else:
+            print(form.errors)
+
+    return render(request,'rango/add_category.html',{'form':form})
+
+
+def add_page(request,category_name_slug):
+    try:
+        category = Category.objects.get(slug=category_name_slug)
+    except:
+        category = None
+
+        # You cannot add a page to a Category that does not exist... DM
+    if category is None:
+        return redirect('/rango/')
+
+    # create an instance
+    form = PageForm
+
+    if request.method == 'POST':
+        form = PageForm(request.POST)
+
+        if form.is_valid():
+            if category:
+                page = form.save(commit=False)
+                page.category = category
+                page.views = 0
+                page.save()
+
+                return redirect(reverse('rango:show_category', kwargs={'category_name_slug': category_name_slug}))
+        else:
+            print(form.errors)  # This could be better done; for the purposes of TwD, this is fine. DM.
+
+    context_dict = {'form': form, 'category': category}
+    #print(context_dict)
+    return render(request, 'rango/add_page.html', context=context_dict)
+
+
