@@ -60,12 +60,14 @@ def add_category(request):
     #create an instance
     form = CategoryForm
     if request.method =='POST':
+
+        #data from backend is added to this form
         form = CategoryForm(request.POST)
         if form.is_valid():
             #save the new category to the database
             cat = form.save(commit=True)
             print(cat)
-            return redirect('/rango/')
+            return redirect(reverse('rango:index'))
         else:
             print(form.errors)
 
@@ -80,7 +82,8 @@ def add_page(request,category_name_slug):
 
         # You cannot add a page to a Category that does not exist... DM
     if category is None:
-        return redirect('/rango/')
+        return redirect(reverse('rango:index'))
+
 
     # create an instance
     form = PageForm
