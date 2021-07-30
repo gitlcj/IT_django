@@ -1,6 +1,8 @@
 from django import forms
 from rango.models import Category,Page
 
+from django.contrib.auth.models import User
+from rango.models import UserProfile
 
 class CategoryForm(forms.ModelForm):
     name = forms.CharField(max_length= Category.NAME_MAX_LENGTH , help_text="Please enter the category name.")
@@ -43,3 +45,21 @@ class PageForm(forms.ModelForm):
             cleaned_data['url'] = url
 
         return cleaned_data
+
+
+class UserForm(forms.ModelForm):
+    #hide a user’s input
+    password = forms.CharField(widget=forms.PasswordInput())
+
+    #Meta class describes additional properties about the particular class to which it belongs.
+    class Meta:
+        model = User
+        # Each Meta class must supply a model field.
+        fields = ('username', 'email', 'password',)
+
+
+class UserProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = UserProfile
+        fields = ('website', 'picture',)

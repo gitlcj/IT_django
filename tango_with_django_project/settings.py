@@ -139,3 +139,6 @@ MEDIA_ROOT = MEDIA_DIR
 #what url to serve
 MEDIA_URL = '/media/'
 
+
+#LOGIN_URL with the URL you’d like to redirect users to that aren’t logged in.
+LOGIN_URL = 'rango:login'
